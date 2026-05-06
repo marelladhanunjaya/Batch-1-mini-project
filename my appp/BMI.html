@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Advanced BMI Calculator</title>
+
+<style>
+body {
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(135deg,#141e30,#243b55);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:white;
+}
+
+.container {
+    background:white;
+    color:black;
+    padding:25px;
+    border-radius:15px;
+    width:90%;
+    max-width:350px;
+    text-align:center;
+    box-shadow:0 10px 25px rgba(0,0,0,0.4);
+}
+
+input {
+    width:100%;
+    padding:10px;
+    margin:8px 0;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+button {
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#ff7e5f;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover {
+    background:#43cea2;
+}
+
+/* 📊 Chart bar */
+.bar {
+    height:20px;
+    width:100%;
+    background:#ddd;
+    border-radius:10px;
+    margin-top:15px;
+    overflow:hidden;
+}
+
+.fill {
+    height:100%;
+    width:0%;
+    transition:0.5s;
+}
+
+/* 📱 Responsive */
+@media(max-width:500px){
+    .container{
+        padding:15px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h2>BMI Calculator</h2>
+
+<input type="number" id="weight" placeholder="Weight (kg)">
+<input type="number" id="height" placeholder="Height (cm)">
+
+<button onclick="calculate()">Calculate</button>
+
+<button onclick="voice()">🎤 Speak</button>
+
+<h3 id="result"></h3>
+<h4 id="status"></h4>
+
+<div class="bar">
+    <div class="fill" id="fill"></div>
+</div>
+
+</div>
+
+<script>
+function calculate(){
+    let w = weight.value;
+    let h = height.value / 100;
+
+    if(!w || !h){
+        alert("Enter values");
+        return;
+    }
+
+    let bmi = (w / (h*h)).toFixed(2);
+    result.innerText = "BMI: " + bmi;
+
+    let statusText="";
+    let color="";
+    let percent=Math.min(bmi*2,100);
+
+    if(bmi < 18.5){
+        statusText="Underweight";
+        color="blue";
+    }
+    else if(bmi < 25){
+        statusText="Normal";
+        color="green";
+    }
+    else if(bmi < 30){
+        statusText="Overweight";
+        color="orange";
+    }
+    else{
+        statusText="Obese";
+        color="red";
+    }
+
+    status.innerText="Status: "+statusText;
+    status.style.color=color;
+
+    fill.style.width=percent+"%";
+    fill.style.background=color;
+}
+
+// 🎤 Voice input
+function voice(){
+    let rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+    rec.onresult = function(e){
+        let text = e.results[0][0].transcript;
+
+        // Example: "weight 60 height 170"
+        let nums = text.match(/\d+/g);
+
+        if(nums && nums.length>=2){
+            weight.value = nums[0];
+            height.value = nums[1];
+        }
+    };
+
+    rec.start();
+}
+</script>
+
+</body>
+</html>
